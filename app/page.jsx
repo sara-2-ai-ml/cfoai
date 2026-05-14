@@ -126,7 +126,7 @@ export default function LandingPage() {
                 When data speaks, decisions become clear.
               </h1>
               <p className="mt-6 max-w-lg text-pretty text-[15px] font-normal leading-relaxed text-[#3F3D56] md:text-lg">
-                AI-powered financial intelligence for CFOs and investors — one workspace for reports, charts,
+                AI-powered financial intelligence for CFOs and investors one workspace for reports, charts,
                 and deep financial insight.
               </p>
               <div className="mt-10">
