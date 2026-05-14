@@ -12,6 +12,10 @@ Upload financial reports → ask questions → simulate market reactions → exp
 > You only need to: Upload your financial report and ask in plain language  
 > cfoai. will return: Cited answers, auto-generated charts, risk scores, and a full market simulation
 
+## Live Demo
+
+[cfoai-theta.vercel.app](https://cfoai-theta.vercel.app)
+
 ### Why cfoai.
 
 |  | Manual | cfoai. |
