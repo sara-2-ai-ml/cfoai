@@ -24,13 +24,16 @@ Upload financial reports → ask questions → simulate market reactions → exp
 
 ## 📸 Screenshots
 
-| Dashboard | Market Simulation |
-|---|---|
-| ![Dashboard](./public/screenshots/screenshot-dashboard.png) | ![Simulate](./public/screenshots/screenshot-simulate.png) |
+## Screenshots
 
-| Charts | Compare Mode |
-|---|---|
-| ![Charts](./public/screenshots/screenshot-charts.png) | ![Compare](./public/screenshots/screenshot-compare.png) |
+![](./public/screenshots/Screenshot%202026-05-14%20164804.png)
+![](./public/screenshots/Screenshot%202026-05-14%20185820.png)
+![](./public/screenshots/Screenshot%202026-05-14%20185919.png)
+![](./public/screenshots/Screenshot%202026-05-14%20190023.png)
+![](./public/screenshots/Screenshot%202026-05-14%20190101.png)
+![](./public/screenshots/Screenshot%202026-05-14%20190156.png)
+![](./public/screenshots/Screenshot%202026-05-14%20190248.png)
+![](./public/screenshots/Screenshot%202026-05-14%20190312.png)
 
 ## ✨ Features
 
@@ -86,14 +89,16 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ## 🔑 Environment Variables
 
-\`\`\`env
+```env
 ANTHROPIC_API_KEY=
 OPENAI_API_KEY=
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
-CHROMA_URL=http://localhost:8000
+CHROMA_URL=https://api.trychroma.com
 CHROMA_API_KEY=
-\`\`\`
+CHROMA_TENANT=
+CHROMA_DATABASE=
+```
 
 ## 🗄 ChromaDB Setup
 
@@ -114,28 +119,40 @@ npm run dev              # terminal 2
 
 ## 📁 Project Structure
 
-\`\`\`
+```
 cfoai/
 ├── app/
 │   ├── api/
-│   │   ├── upload/        # Document indexing
-│   │   ├── query/         # RAG queries + compare
-│   │   ├── summary/       # Financial summary
-│   │   ├── simulate/      # Market simulation
-│   │   ├── scenario/      # What-if analysis
-│   │   └── debate/        # Agent debate
-│   └── dashboard/
+│   │   ├── upload/          # Document indexing + ChromaDB
+│   │   ├── query/           # RAG queries + compare mode
+│   │   ├── summary/         # Financial summary generation
+│   │   ├── simulate/        # 6 AI persona simulation
+│   │   ├── scenario/        # What-if scenario analysis
+│   │   ├── debate/          # Agent vs agent debate
+│   │   └── charts/          # Auto chart generation
+│   ├── dashboard/           # Dashboard page
+│   ├── layout.jsx           # App layout
+│   ├── page.jsx             # Landing page
+│   └── globals.css          # Global styles
 ├── components/
-│   └── DashboardClient.jsx
+│   ├── DashboardClient.jsx  # Main dashboard UI
+│   ├── SimulatePanel.jsx    # Market simulation panel
+│   ├── FinancialCharts.jsx  # Chart components
+│   ├── CompareResult.jsx    # Compare mode UI
+│   ├── FileUpload.jsx       # File upload component
+│   ├── Chat.jsx             # Chat interface
+│   └── SplineRobot.jsx      # 3D robot animation
 ├── lib/
-│   ├── embeddings.js      # OpenAI embeddings
-│   ├── vectordb.js        # ChromaDB client
-│   ├── processor.js       # PDF/Excel parser
-│   ├── rag.js             # RAG pipeline
-│   └── citations.js       # Citation deduplication
+│   ├── embeddings.js        # OpenAI embeddings
+│   ├── vectordb.js          # ChromaDB client
+│   ├── processor.js         # PDF/Excel/Image parser
+│   ├── rag.js               # RAG pipeline
+│   ├── citations.js         # Citation deduplication
+│   ├── exportPDF.js         # PDF export
+│   └── exportExcel.js       # Excel export
 └── public/
-    └── screenshots/
-\`\`\`
+    └── screenshots/         # App screenshots
+```
 
 ## 📄 License
 
