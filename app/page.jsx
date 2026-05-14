@@ -88,7 +88,7 @@ export default function LandingPage() {
 
         <div className="relative z-10 mx-auto flex max-w-7xl flex-col px-5 pb-16 pt-8 md:px-10 md:pb-20 md:pt-10">
           {/* ── Nav ── */}
-          <header className="grid w-full min-w-0 grid-cols-[1fr_auto] items-center gap-x-3 gap-y-4 md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-x-5 lg:gap-x-8">
+          <header className="grid w-full min-w-0 grid-cols-[1fr] items-center gap-y-4 md:grid-cols-[auto_minmax(0,1fr)] md:gap-x-5 lg:gap-x-8">
             <Link
               href="/"
               className="font-display col-start-1 row-start-1 shrink-0 justify-self-start text-[15px] font-semibold lowercase tracking-[0.04em] text-[#1E1B4B] md:text-base"
@@ -96,15 +96,8 @@ export default function LandingPage() {
               cfoai.
             </Link>
 
-            <Link
-              href="/sign-in"
-              className="col-start-2 row-start-1 shrink-0 justify-self-end whitespace-nowrap rounded-full border border-[#C7D2FE]/60 bg-white/70 px-5 py-2.5 text-center text-[12px] font-semibold text-[#1E1B4B] shadow-sm backdrop-blur-md transition hover:border-[#A5B4FC] hover:bg-white md:col-start-3 md:px-7 md:py-3 md:text-[13px]"
-            >
-              Sign in
-            </Link>
-
             <nav
-              className="col-span-2 row-start-2 flex min-w-0 w-full justify-center md:col-span-1 md:col-start-2 md:row-start-1 md:px-1"
+              className="col-start-1 row-start-2 flex min-w-0 w-full justify-center md:col-start-2 md:row-start-1 md:px-1"
               aria-label="Site"
             >
               <div className="flex max-w-full flex-wrap items-center justify-center gap-x-1 gap-y-2 overflow-x-auto rounded-full border border-[#C7D2FE]/50 bg-white/70 px-2 py-2 shadow-sm backdrop-blur-xl sm:gap-x-2 sm:px-4 sm:py-2">

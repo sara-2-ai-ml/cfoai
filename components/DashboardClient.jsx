@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { UserButton, useUser } from "@clerk/nextjs";
 import html2canvas from "html2canvas";
 import {
   AlignLeft,
@@ -231,7 +230,6 @@ function NavIconButton({ onClick, label, Icon, active }) {
 }
 
 export default function DashboardClient() {
-  const { user } = useUser();
   const skipPersistRef = useRef(true);
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
@@ -354,11 +352,6 @@ export default function DashboardClient() {
   async function handleExportExcel() {
     setExcelExporting(true);
     try {
-      const displayName =
-        user?.fullName?.trim() ||
-        [user?.firstName, user?.lastName].filter(Boolean).join(" ").trim() ||
-        user?.username?.trim() ||
-        "";
       await exportCfoaiDashboardXlsx({
         summary,
         documentName: summaryTargetFile || "Report",
@@ -367,9 +360,9 @@ export default function DashboardClient() {
         chatMessages,
         appVersion: process.env.NEXT_PUBLIC_APP_VERSION || "",
         userInfo: {
-          userId: user?.id ?? "",
-          email: user?.primaryEmailAddress?.emailAddress ?? "",
-          displayName
+          userId: "",
+          email: "",
+          displayName: ""
         }
       });
       toast.success("Excel downloaded");
@@ -603,17 +596,6 @@ export default function DashboardClient() {
               </button>
             ))}
           </nav>
-        </div>
-        <div className="flex items-center gap-3">
-          {user?.firstName && (
-            <span className="hidden text-xs text-white/40 md:block">{user.firstName}</span>
-          )}
-          <UserButton
-            afterSignOutUrl="/"
-            appearance={{
-              elements: { avatarBox: "h-8 w-8 ring-1 ring-white/[0.08]" }
-            }}
-          />
         </div>
       </header>
 
