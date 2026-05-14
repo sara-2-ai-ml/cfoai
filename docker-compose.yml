@@ -1,0 +1,8 @@
+# Local ChromaDB for CFOai (matches CHROMA_URL=http://localhost:8000 in .env.local)
+services:
+  chroma:
+    image: chromadb/chroma:latest
+    ports:
+      - "8000:8000"
+    environment:
+      ANONYMIZED_TELEMETRY: "false"
