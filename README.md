@@ -30,14 +30,21 @@ Upload financial reports → ask questions → simulate market reactions → exp
 
 ## Screenshots
 
-![](./public/screenshots/Screenshot%202026-05-14%20164804.png)
-![](./public/screenshots/Screenshot%202026-05-14%20185820.png)
-![](./public/screenshots/Screenshot%202026-05-14%20185919.png)
-![](./public/screenshots/Screenshot%202026-05-14%20190023.png)
-![](./public/screenshots/Screenshot%202026-05-14%20190101.png)
-![](./public/screenshots/Screenshot%202026-05-14%20190156.png)
-![](./public/screenshots/Screenshot%202026-05-14%20190248.png)
-![](./public/screenshots/Screenshot%202026-05-14%20190312.png)
+![](./public/screenshots/1-Landing%20page.png)
+
+![](./public/screenshots/Screenshot%201.png)
+
+![](./public/screenshots/Screenshot%202.png)
+
+![](./public/screenshots/Screenshot%203.png)
+
+![](./public/screenshots/Screenshot%204.png)
+
+![](./public/screenshots/Screenshot%205.png)
+
+![](./public/screenshots/Screenshot%206.png)
+
+![](./public/screenshots/Screenshot%207.png)
 
 ## ✨ Features
 
