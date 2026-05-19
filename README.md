@@ -12,25 +12,10 @@ Upload financial reports → ask questions in plain language → simulate market
 
 ---
 
-## Screenshots
+## 🚀 Live Demo
 
-![Landing page](./public/screenshots/1-Landing%20page.png)
+**[cfoai-theta.vercel.app](https://cfoai-theta.vercel.app/)**
 
-![Dashboard overview](./public/screenshots/Screenshot%201.png)
-
-![Financial summary](./public/screenshots/Screenshot%202.png)
-
-![Market simulation](./public/screenshots/Screenshot%203.png)
-
-![Scenario analysis](./public/screenshots/Screenshot%204.png)
-
-![Charts](./public/screenshots/Screenshot%205.png)
-
-![Document compare](./public/screenshots/Screenshot%206.png)
-
-![Export](./public/screenshots/Screenshot%207.png)
-
----
 
 ## Overview
 
@@ -102,6 +87,26 @@ Risk Assessment  →  score 0–100  +  key risk factors
           ↓
 Scenario Analysis  →  what-if prompt  →  6 persona re-analysis
 ```
+
+---
+
+## Screenshots
+
+![Landing page](./public/screenshots/1-Landing%20page.png)
+
+![Dashboard overview](./public/screenshots/Screenshot%201.png)
+
+![Financial summary](./public/screenshots/Screenshot%202.png)
+
+![Market simulation](./public/screenshots/Screenshot%203.png)
+
+![Scenario analysis](./public/screenshots/Screenshot%204.png)
+
+![Charts](./public/screenshots/Screenshot%205.png)
+
+![Document compare](./public/screenshots/Screenshot%206.png)
+
+![Export](./public/screenshots/Screenshot%207.png)
 
 ---
 
