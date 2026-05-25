@@ -14,7 +14,7 @@ Upload financial reports → ask questions in plain language → simulate market
 
 ## 🚀 Live Demo
 
-**[cfoai-theta.vercel.app](https://cfoai-theta.vercel.app/)**
+**[cfoai-theta.vercel.app](https://cfoai-iqb7.vercel.app/)**
 
 
 ## Overview
