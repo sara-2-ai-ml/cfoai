@@ -1,25 +1,44 @@
 import { isMissingEnvError, isVectorInfrastructureError } from "@/lib/infrastructure-errors";
 import { queryRAG, queryRAGCompare } from "@/lib/rag";
 import { getDocumentsByFilename } from "@/lib/vectordb";
-
+ 
 export const runtime = "nodejs";
-
+ 
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { question, imageBase64 } = body;
+    const { question, imageBase64, conversationHistory = [] } = body;
+ 
     if (!question?.trim()) {
       return Response.json({ error: "Question is required" }, { status: 400 });
     }
-
+ 
+    // ── Validate conversationHistory shape ────────────────────────────────────
+    const validHistory = Array.isArray(conversationHistory)
+      ? conversationHistory
+          .filter(
+            (m) =>
+              m &&
+              (m.role === "user" || m.role === "assistant") &&
+              typeof m.content === "string" &&
+              m.content.trim().length > 0
+          )
+          .map((m) => ({ role: m.role, content: m.content }))
+          .slice(-20) // max 10 turns
+      : [];
+ 
+    // ── Compare mode: collect filenames ───────────────────────────────────────
     let rawNames = [];
     if (Array.isArray(body.compareDocumentNames)) {
-      rawNames = [...new Set(body.compareDocumentNames.map((x) => String(x ?? "").trim()).filter(Boolean))].slice(
-        0,
-        3
-      );
+      rawNames = [
+        ...new Set(
+          body.compareDocumentNames
+            .map((x) => String(x ?? "").trim())
+            .filter(Boolean)
+        )
+      ].slice(0, 3);
     }
-
+ 
     if (rawNames.length >= 2) {
       for (const name of rawNames) {
         const rows = await getDocumentsByFilename(name, 1);
@@ -31,45 +50,65 @@ export async function POST(req) {
         }
       }
     }
-
+ 
+    // ── Run RAG ───────────────────────────────────────────────────────────────
     let stream;
     let citations;
-    // Compare mode: Chroma is queried per selected filename; see queryRAGCompare in lib/rag.js.
+ 
     if (rawNames.length >= 2) {
-      ({ stream, citations } = await queryRAGCompare(question.trim(), rawNames, imageBase64));
+      ({ stream, citations } = await queryRAGCompare(
+        question.trim(),
+        rawNames,
+        imageBase64,
+        validHistory
+      ));
     } else if (rawNames.length === 1) {
       return Response.json(
         { error: "Compare mode requires at least two selected documents." },
         { status: 400 }
       );
     } else {
-      ({ stream, citations } = await queryRAG(question.trim(), imageBase64));
+      ({ stream, citations } = await queryRAG(
+        question.trim(),
+        imageBase64,
+        validHistory
+      ));
     }
-
+ 
+    // ── Stream response ───────────────────────────────────────────────────────
     const encoder = new TextEncoder();
     const responseStream = new ReadableStream({
       async start(controller) {
         try {
           for await (const event of stream) {
-            if (event.type === "content_block_delta" && event.delta?.type === "text_delta") {
+            if (
+              event.type === "content_block_delta" &&
+              event.delta?.type === "text_delta"
+            ) {
               controller.enqueue(
-                encoder.encode(`data: ${JSON.stringify({ type: "token", token: event.delta.text })}\n\n`)
+                encoder.encode(
+                  `data: ${JSON.stringify({ type: "token", token: event.delta.text })}\n\n`
+                )
               );
             }
           }
           controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ type: "done", citations })}\n\n`)
+            encoder.encode(
+              `data: ${JSON.stringify({ type: "done", citations })}\n\n`
+            )
           );
           controller.close();
         } catch (err) {
           controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ type: "error", message: "Streaming failed" })}\n\n`)
+            encoder.encode(
+              `data: ${JSON.stringify({ type: "error", message: "Streaming failed" })}\n\n`
+            )
           );
           controller.close();
         }
       }
     });
-
+ 
     return new Response(responseStream, {
       headers: {
         "Content-Type": "text/event-stream",
@@ -81,8 +120,7 @@ export async function POST(req) {
     if (isVectorInfrastructureError(error)) {
       return Response.json(
         {
-          error:
-            "ChromaDB is not reachable. Start the vector database or check CHROMA_URL.",
+          error: "ChromaDB is not reachable. Start the vector database or check CHROMA_URL.",
           code: "VECTOR_DB_UNAVAILABLE"
         },
         { status: 503 }
@@ -90,7 +128,10 @@ export async function POST(req) {
     }
     if (isMissingEnvError(error)) {
       return Response.json(
-        { error: error?.message || "Missing API configuration.", code: "MISSING_CONFIGURATION" },
+        {
+          error: error?.message || "Missing API configuration.",
+          code: "MISSING_CONFIGURATION"
+        },
         { status: 503 }
       );
     }

@@ -110,6 +110,18 @@ export default function Chat({
     const orderedCompareNames = compareReady
       ? docNames.filter((n) => compareDocumentNames.includes(n))
       : [];
+
+    // ── Build conversation history BEFORE adding new messages ──────────────
+    const conversationHistory = messages
+      .filter(
+        (m) =>
+          (m.role === "user" || m.role === "assistant") &&
+          typeof m.content === "string" &&
+          m.content.trim().length > 0
+      )
+      .map((m) => ({ role: m.role, content: m.content }))
+      .slice(-20);
+
     setQuestion("");
     setMessages((prev) => [...prev, { role: "user", content: currentQuestion }]);
     setIsLoading(true);
@@ -135,6 +147,7 @@ export default function Chat({
     try {
       const payload = {
         question: currentQuestion,
+        conversationHistory,
         ...(compareReady && orderedCompareNames.length >= 2
           ? { compareDocumentNames: orderedCompareNames }
           : {})
@@ -260,7 +273,6 @@ export default function Chat({
 
   return (
     <div className="flex flex-col rounded-2xl border border-white/[0.06] bg-card">
-      {/* Header */}
       <div className="border-b border-white/[0.04] px-5 py-3">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -334,12 +346,10 @@ export default function Chat({
         )}
       </div>
 
-      {/* Messages */}
       <div
         ref={scrollRef}
         className="relative max-h-[min(52vh,26rem)] overflow-y-auto overscroll-y-contain p-4"
       >
-        {/* Fade top */}
         <div className="pointer-events-none sticky -top-4 left-0 right-0 z-10 -mt-4 h-6 bg-gradient-to-b from-card to-transparent" />
 
         {messages.length === 0 ? (
@@ -391,20 +401,22 @@ export default function Chat({
                 </div>
               </div>
             ))}
-            {messages.length > 0 && messages[messages.length - 1].role === "assistant" && messages[messages.length - 1].citations?.length > 0 && (
-              <div className="ml-1 space-y-0.5 text-[10px] text-white/25">
-                {dedupeCitations(messages[messages.length - 1].citations).map((citation, i) => (
-                  <p key={`${citation.file}-${citation.page ?? "p"}-${i}`}>
-                    {citation.file}{citation.page != null ? ` · p${citation.page}` : ""}
-                  </p>
-                ))}
-              </div>
-            )}
+            {messages.length > 0 &&
+              messages[messages.length - 1].role === "assistant" &&
+              messages[messages.length - 1].citations?.length > 0 && (
+                <div className="ml-1 space-y-0.5 text-[10px] text-white/25">
+                  {dedupeCitations(messages[messages.length - 1].citations).map((citation, i) => (
+                    <p key={`${citation.file}-${citation.page ?? "p"}-${i}`}>
+                      {citation.file}
+                      {citation.page != null ? ` · p${citation.page}` : ""}
+                    </p>
+                  ))}
+                </div>
+              )}
           </div>
         )}
       </div>
 
-      {/* Input */}
       <form onSubmit={askQuestion} className="border-t border-white/[0.04] p-3">
         <div className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-[#09090B] px-3 py-1.5">
           <input
