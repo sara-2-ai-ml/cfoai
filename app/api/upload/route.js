@@ -5,9 +5,10 @@ import crypto from "crypto";
 import { isMissingEnvError, isVectorInfrastructureError } from "@/lib/infrastructure-errors";
 import { indexDocument } from "@/lib/rag";
 import { deleteDocumentsByFilename } from "@/lib/vectordb";
-
+import { extractAndStore, deleteDocumentFromGraph } from "@/lib/graph-extractor";
+ 
 export const runtime = "nodejs";
-
+ 
 export async function DELETE(req) {
   try {
     let body = {};
@@ -20,8 +21,17 @@ export async function DELETE(req) {
     if (!filename) {
       return Response.json({ error: "filename is required" }, { status: 400 });
     }
-
+ 
+    // Delete from vector store
     await deleteDocumentsByFilename(filename);
+ 
+    // Delete from graph — modular, won't break if Neo4j is down
+    try {
+      await deleteDocumentFromGraph(filename);
+    } catch {
+      // Graph deletion failed — continue anyway
+    }
+ 
     return Response.json({ success: true });
   } catch (error) {
     if (isVectorInfrastructureError(error)) {
@@ -29,8 +39,7 @@ export async function DELETE(req) {
         {
           success: false,
           code: "VECTOR_DB_UNAVAILABLE",
-          error:
-            "Cannot reach ChromaDB. Start it on port 8000 or set CHROMA_URL in .env.local."
+          error: "Cannot reach ChromaDB. Start it on port 8000 or set CHROMA_URL in .env.local."
         },
         { status: 503 }
       );
@@ -41,18 +50,18 @@ export async function DELETE(req) {
     );
   }
 }
-
+ 
 export async function POST(req) {
   try {
     const formData = await req.formData();
     const files = formData.getAll("files");
-
+ 
     if (!files.length) {
       return Response.json({ error: "No files uploaded" }, { status: 400 });
     }
-
+ 
     const uploaded = [];
-
+ 
     for (const file of files) {
       if (typeof file !== "object" || file == null || typeof file.arrayBuffer !== "function") {
         return Response.json(
@@ -63,17 +72,26 @@ export async function POST(req) {
           { status: 400 }
         );
       }
-
+ 
       const displayName = path.basename(
         typeof file.name === "string" && file.name ? file.name : "document.bin"
       ) || "document.bin";
       const buffer = Buffer.from(await file.arrayBuffer());
       const tempFilePath = path.join(os.tmpdir(), `${crypto.randomUUID()}-${displayName}`);
-
+ 
       await fs.promises.writeFile(tempFilePath, buffer);
-
+ 
       try {
+        // Index in ChromaDB (vector store)
         const chunks = await indexDocument(tempFilePath, displayName);
+ 
+        // Extract entities and store in Neo4j — modular, won't break if it fails
+        try {
+          await extractAndStore(chunks, displayName);
+        } catch {
+          // Graph extraction failed — vector RAG still works
+        }
+ 
         uploaded.push({
           id: crypto.randomUUID(),
           name: displayName,
@@ -101,7 +119,7 @@ export async function POST(req) {
         await fs.promises.unlink(tempFilePath).catch(() => {});
       }
     }
-
+ 
     const anyIndexError = uploaded.some((f) => f.indexError);
     return Response.json({
       success: true,

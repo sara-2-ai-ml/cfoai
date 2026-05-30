@@ -40,14 +40,19 @@ export async function POST(req) {
     }
  
     if (rawNames.length >= 2) {
-      for (const name of rawNames) {
-        const rows = await getDocumentsByFilename(name, 1);
-        if (!rows.length) {
-          return Response.json(
-            { error: "Document not indexed — please re-upload" },
-            { status: 400 }
-          );
+      try {
+        for (const name of rawNames) {
+          const rows = await getDocumentsByFilename(name, 1);
+          if (!rows.length) {
+            return Response.json(
+              { error: "Document not indexed — please re-upload" },
+              { status: 400 }
+            );
+          }
         }
+      } catch (err) {
+        if (!isVectorInfrastructureError(err)) throw err;
+        // Chroma unavailable — allow graph-only compare fallback
       }
     }
  
@@ -117,6 +122,15 @@ export async function POST(req) {
       }
     });
   } catch (error) {
+    if (error?.code === "RETRIEVAL_UNAVAILABLE") {
+      return Response.json(
+        {
+          error: "No retrieval sources available. Check ChromaDB and Neo4j configuration.",
+          code: "RETRIEVAL_UNAVAILABLE"
+        },
+        { status: 503 }
+      );
+    }
     if (isVectorInfrastructureError(error)) {
       return Response.json(
         {

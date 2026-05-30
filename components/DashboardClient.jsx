@@ -21,6 +21,7 @@ import FinancialCharts from "@/components/FinancialCharts";
 import FileList from "@/components/FileList";
 import FileUpload from "@/components/FileUpload";
 import SimulatePanel from "@/components/SimulatePanel";
+import KnowledgeGraph from "@/components/KnowledgeGraph";
 import Summary from "@/components/Summary";
 import { buildChatStorageKey } from "@/lib/chat-storage";
 import { exportCfoaiDashboardPdf } from "@/lib/exportPDF";
@@ -576,6 +577,7 @@ export default function DashboardClient() {
               { id: "overview", label: "Overview" },
               { id: "documents", label: "Documents" },
               { id: "analytics", label: "Analytics" },
+              { id: "graph", label: "Knowledge Graph" },
               { id: "simulate", label: "Simulate" },
             ].map((tab) => (
               <button
@@ -669,6 +671,10 @@ export default function DashboardClient() {
                   onSummaryTargetFileChange={setSummaryTargetFile}
                 />
               </div>
+            </div>
+          ) : activeTab === "graph" ? (
+            <div className="rounded-2xl border border-white/[0.06] bg-card p-5 md:p-6">
+              <KnowledgeGraph />
             </div>
           ) : (
           <>

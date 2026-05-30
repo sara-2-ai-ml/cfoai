@@ -1,0 +1,140 @@
+# =============================================================================
+# cfoai — Project Requirements
+# =============================================================================
+# This is a Node.js / Next.js project (NOT Python).
+# Do NOT run: pip install -r requirements.txt
+#
+# Quick setup:
+#   1. Install Node.js 18+ and npm
+#   2. git clone <repo> && cd cfoai
+#   3. npm install
+#   4. cp .env.example .env.local   (then fill in API keys)
+#   5. npm run dev:full             (ChromaDB via Docker + Next.js)
+#      — or npm run dev             (Next.js only, if Chroma Cloud is configured)
+#
+# App URL:  http://localhost:3000
+# Chroma:   http://localhost:8000  (local Docker only)
+# =============================================================================
+
+
+# --- RUNTIME (install on your machine) ---------------------------------------
+
+node>=18.0.0
+npm>=9.0.0
+
+# Optional — local ChromaDB via Docker
+docker>=20.0.0
+docker-compose>=2.0.0
+
+
+# --- NPM PRODUCTION DEPENDENCIES ---------------------------------------------
+# Installed automatically by: npm install
+# Listed here for reference (versions from package.json)
+
+@anthropic-ai/sdk@^0.51.0
+@radix-ui/react-scroll-area@^1.2.0
+@radix-ui/react-separator@^1.1.0
+@splinetool/react-spline@^4.1.0
+@splinetool/runtime@^1.12.92
+chromadb@^3.4.3
+class-variance-authority@^0.7.0
+clsx@^2.1.1
+d3@^7.9.0
+dotenv@^17.4.2
+html2canvas@^1.4.1
+jspdf@^4.2.1
+lucide-react@^0.511.0
+neo4j-driver@^6.0.1
+next@^15.0.0
+openai@^4.77.3
+pdf-parse@^1.1.1
+react@^19.0.0
+react-dom@^19.0.0
+react-hot-toast@^2.6.0
+react-markdown@^10.1.0
+remark-gfm@^4.0.1
+sharp@^0.33.5
+tailwind-merge@^2.6.0
+three@^0.173.0
+xlsx@^0.18.5
+xlsx-js-style@^1.2.0
+
+
+# --- NPM DEV DEPENDENCIES (development only) ---------------------------------
+
+autoprefixer@^10.4.20
+concurrently@^9.2.1
+eslint@^9.15.0
+eslint-config-next@^15.0.0
+postcss@^8.4.49
+tailwindcss@^3.4.16
+wait-on@^9.0.10
+
+
+# --- EXTERNAL SERVICES (accounts / instances required) -----------------------
+
+# 1. Anthropic API — chat, summaries, simulation, GraphRAG entity extraction
+#    https://console.anthropic.com/
+
+# 2. OpenAI API — embeddings (ChromaDB indexing) + chart generation
+#    https://platform.openai.com/
+
+# 3. ChromaDB — vector store for document RAG
+#    Option A: Local Docker  →  npm run chroma:up  or  npm run dev:full
+#    Option B: Chroma Cloud  →  https://www.trychroma.com/
+
+# 4. Neo4j 5.x — GraphRAG knowledge graph (entity storage + Cypher retrieval)
+#    Recommended: Neo4j Aura free tier
+#    https://neo4j.com/cloud/platform/aura-graph/
+
+
+# --- ENVIRONMENT VARIABLES (.env.local) --------------------------------------
+# Copy from .env.example and fill in values.
+
+# Required — AI
+ANTHROPIC_API_KEY=
+OPENAI_API_KEY=
+
+# Required — ChromaDB (pick local OR cloud)
+CHROMA_URL=http://localhost:8000
+CHROMA_API_KEY=                  # required for Chroma Cloud
+CHROMA_TENANT=                   # required for Chroma Cloud
+CHROMA_DATABASE=                 # optional
+
+# Required — Neo4j GraphRAG
+NEO4J_URI=neo4j+s://xxxx.databases.neo4j.io
+NEO4J_USERNAME=neo4j
+NEO4J_PASSWORD=
+NEO4J_DATABASE=neo4j              # optional (Aura)
+
+# Optional
+ANTHROPIC_MODEL=                 # default: claude-sonnet-4-5-20250929
+BLOB_READ_WRITE_TOKEN=           # Vercel Blob storage
+NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=
+
+
+# --- GRAPH RAG / HYBRID CHAT NOTES -------------------------------------------
+
+# Upload pipeline:
+#   PDF/Excel → ChromaDB (vector) + Neo4j (entity graph via Claude extraction)
+
+# Chat pipeline (hybrid retrieval):
+#   Question → Vector RAG (Chroma) + Graph RAG (Neo4j) in parallel
+#           → RRF merge → Claude → answer + citations
+
+# Graceful fallback:
+#   Neo4j down   → chat uses vector RAG only
+#   Chroma down  → chat uses graph RAG only
+#   Both down    → error RETRIEVAL_UNAVAILABLE
+
+
+# --- VERIFY SETUP ------------------------------------------------------------
+
+# Test Neo4j connection:
+#   node scripts/test-neo4j.cjs
+
+# Test graph API (after uploading a document):
+#   http://localhost:3000/api/graph
+
+# Test hybrid chat:
+#   Dashboard → Ask → submit a financial question
